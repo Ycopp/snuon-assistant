@@ -1,10 +1,10 @@
 {
-  "name": "Video Speed Controller",
-  "short_name": "videospeed",
-  "version": "0.5.4",
+  "name": "SNUON Assistant",
+  "short_name": "snuon",
+  "version": "0.1.0",
   "manifest_version": 2,
-  "description": "Speed up, slow down, advance and rewind any HTML5 video with quick shortcuts.",
-  "homepage_url": "https://github.com/igrigorik/videospeed",
+  "description": "SNUON 단축키, 배속 재생 등",
+  "homepage_url": "https://github.com/ylemkimon/snuon-assistant",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -21,14 +21,9 @@
     "default_popup": "popup.html"
   },
   "content_scripts": [{
-      "all_frames": true,
-      "matches": [ "http://*/*", "https://*/*", "file:///*" ],
-      "exclude_matches": [
-        "https://plus.google.com/hangouts/*",
-        "https://hangouts.google.com/*",
-        "https://meet.google.com/*",
-        "https://teamtreehouse.com/*",
-        "http://www.hitbox.tv/*"
+      "matches": [
+        "http://etl.snu.ac.kr/mod/vod/viewer.php*",
+        "https://etl.snu.ac.kr/mod/vod/viewer.php*"
       ],
       "css": [ "inject.css" ],
       "js":  [ "inject.js" ]

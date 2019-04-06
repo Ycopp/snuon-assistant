@@ -3,7 +3,7 @@ body {
 	padding-left: 15px;
 	padding-top: 53px;
 	font-family: sans-serif;
-	font-size: 12px;
+	font-size: 15px;
 	color: rgb(48, 57, 66);
 }
 
@@ -68,10 +68,14 @@ button {
     user-select: none;
 }
 
-
 input[type="text"] {
-    width: 75px;
-    text-align: center;
+  width: 85px;
+  text-align: center;
+}
+
+input[type="number"] {
+  width: 50px;
+  text-align: right;
 }
 
 .row {
@@ -92,12 +96,4 @@ label {
 
 #faq {
 	margin-top: 2em;
-}
-
-select {
-	width: 170px;
-}
-
-.customForce {
-	display: none;
 }

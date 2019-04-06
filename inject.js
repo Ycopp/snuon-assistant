@@ -1,120 +1,29 @@
   var tc = {
     settings: {
-      speed: 1.0,           // default 1x
-
-      /**
-       * these are not used and deprecated, will be removed in next update
-       * but should be stay there because chrome.storage.sync.get needs them
-       */
-      resetSpeed: 1.0,      // default 1.0
-      speedStep: null,       // default 0.1x just for buttons
-      fastSpeed: null,       // default 1.8x
-      rewindTime: null,       // default 10s just for buttons
-      advanceTime: null,      // default 10s just for buttons
-      resetKeyCode: null,    // default: R
-      slowerKeyCode: null,    // default: S
-      fasterKeyCode: null,    // default: D
-      rewindKeyCode: null,    // default: Z
-      advanceKeyCode: null,   // default: X
-      fastKeyCode: null,      // default: G
-      /**
-       * these(above) are not used and deprecated, will be removed in next update
-       * but should be stay there because chrome.storage.sync.get needs them.
-       */
-
-      displayKeyCode: 86,   // default: V
-      rememberSpeed: false, // default: false
-      startHidden: false,   // default: false
-      keyBindings: [],
-      blacklist: `
-        www.instagram.com
-        twitter.com
-        vine.co
-        imgur.com
-      `.replace(/^\s+|\s+$/gm,'')
+      speed: 1.0,
+      rememberSpeed: false,
+      startHidden: false,
+      enableSeek: false,
+      goYoutube: false,
+      keyBindings: {
+        display: {key: 86},            // V
+        slower: {key: 88, value: 0.1}, // X
+        faster: {key: 66, value: 0.1}, // B
+        rewind: {key: 37, value: 10},  // ←
+        advance: {key: 39, value: 10}, // →
+        reset: {key: 90},              // Z
+        fast: {key: 71, value: 1.8},   // G
+        pause: {key: 32}               // Space
+      }
     }
   };
 
   chrome.storage.sync.get(tc.settings, function (storage) {
-    tc.settings.keyBindings = storage.keyBindings; // Array
-    if (storage.keyBindings.length == 0) // if first initialization of 0.5.3
-    {
-      // UPDATE
-      tc.settings.keyBindings.push({
-        action: "slower",
-        key: Number(storage.slowerKeyCode) || 83,
-        value: Number(storage.speedStep) || 0.1,
-        force: false,
-        predefined: true
-      }); // default S
-      tc.settings.keyBindings.push({
-        action: "faster",
-        key: Number(storage.fasterKeyCode) || 68,
-        value: Number(storage.speedStep) || 0.1,
-        force: false,
-        predefined: true
-      }); // default: D
-      tc.settings.keyBindings.push({
-        action: "rewind",
-        key: Number(storage.rewindKeyCode) || 90,
-        value: Number(storage.rewindTime) || 10,
-        force: false,
-        predefined: true
-      }); // default: Z
-      tc.settings.keyBindings.push({
-        action: "advance",
-        key: Number(storage.advanceKeyCode) || 88,
-        value: Number(storage.advanceTime) || 10,
-        force: false,
-        predefined: true
-      }); // default: X
-      tc.settings.keyBindings.push({
-        action: "reset",
-        key: Number(storage.resetKeyCode) || 82,
-        value: 1.0,
-        force: false,
-        predefined: true
-      }); // default: R
-      tc.settings.keyBindings.push({
-        action: "fast",
-        key: Number(storage.fastKeyCode) || 71,
-        value: Number(storage.fastSpeed) || 1.8,
-        force: false,
-        predefined: true
-      }); // default: G
-      tc.settings.version = "0.5.3";
-
-      chrome.storage.sync.set({
-        keyBindings: tc.settings.keyBindings,
-        version: tc.settings.version,
-        displayKeyCode: tc.settings.displayKeyCode,
-        rememberSpeed: tc.settings.rememberSpeed,
-        startHidden: tc.settings.startHidden,
-        blacklist: tc.settings.blacklist.replace(/^\s+|\s+$/gm, '')
-      });
-    }
-    tc.settings.speed = Number(storage.speed);
-    tc.settings.displayKeyCode = Number(storage.displayKeyCode);
-    tc.settings.rememberSpeed = Boolean(storage.rememberSpeed);
-    tc.settings.startHidden = Boolean(storage.startHidden);
-    tc.settings.blacklist = String(storage.blacklist);
-
+    tc.settings = storage;
     initializeWhenReady(document);
   });
 
   var forEach = Array.prototype.forEach;
-
-  function getKeyBindings(action, what = "value") {
-    try {
-      return tc.settings.keyBindings.find(item => item.action === action)[what];
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function setKeyBindings(action, value) {
-    tc.settings.keyBindings.find(item => item.action === action)["value"] = value;
-  }
 
   function defineVideoController() {
     tc.videoController = function(target, parent) {
@@ -128,7 +37,6 @@
       this.id = Math.random().toString(36).substr(2, 9);
       if (!tc.settings.rememberSpeed) {
         tc.settings.speed = 1.0;
-        setKeyBindings("reset", getKeyBindings("fast")); // resetSpeed = fastSpeed
       }
       this.initializeControls();
 
@@ -143,9 +51,7 @@
           var speed = this.getSpeed();
           this.speedIndicator.textContent = speed;
           tc.settings.speed = speed;
-          chrome.storage.sync.set({'speed': speed}, function() {
-            console.log('Speed setting saved: ' + speed);
-          });
+          chrome.storage.sync.set({'speed': speed});
         }
       }.bind(this));
 
@@ -169,6 +75,7 @@
       var wrapper = document.createElement('div');
       wrapper.classList.add('vsc-controller');
       wrapper.dataset['vscid'] = this.id;
+      wrapper.addEventListener('pointerdown', e => e.stopPropagation());
 
       if (tc.settings.startHidden) {
         wrapper.classList.add('vsc-hidden');
@@ -198,7 +105,8 @@
 
       forEach.call(shadow.querySelectorAll('button'), function(button) {
         button.onclick = (e) => {
-          runAction(e.target.dataset['action'], document, getKeyBindings(e.target.dataset['action']), e);
+          var action = e.target.dataset['action'];
+          runAction(action, document, tc.settings.keyBindings[action].value, e);
         }
       });
 
@@ -208,20 +116,7 @@
 
       this.video.dataset['vscid'] = this.id;
 
-      switch (true) {
-        case (location.hostname == 'www.amazon.com'):
-        case (location.hostname == 'www.reddit.com'):
-        case (/hbogo\./).test(location.hostname):
-          // insert before parent to bypass overlay
-          this.parent.parentElement.insertBefore(fragment, this.parent);
-          break;
-
-        default:
-          // Note: when triggered via a MutationRecord, it's possible that the
-          // target is not the immediate parent. This appends the controller as
-          // the first element of the target, which may not be the parent.
-          this.parent.insertBefore(fragment, this.parent.firstChild);
-      }
+      this.parent.insertBefore(fragment, this.parent.firstChild);
     }
   }
 
@@ -230,23 +125,6 @@
     function escapeStringRegExp(str) {
       return str.replace(escapeStringRegExp.matchOperatorsRe, '\\$&');
     }
-
-    var blacklisted = false;
-    tc.settings.blacklist.split("\n").forEach(match => {
-      match = match.replace(/^\s+|\s+$/g,'')
-      if (match.length == 0) {
-        return;
-      }
-
-      var regexp = new RegExp(escapeStringRegExp(match));
-      if (regexp.test(location.href)) {
-        blacklisted = true;
-        return;
-      }
-    })
-
-    if (blacklisted)
-      return;
 
     window.onload = () => {
       initializeNow(window.document)
@@ -276,6 +154,12 @@
         return;
       }
       document.body.classList.add('vsc-initialized');
+
+      if (tc.settings.enableSeek) {
+        var s = document.createElement('script');
+        s.textContent = "$(function(){jwplayer().off('seek')})";
+        (document.head || document.documentElement).appendChild(s);
+      }
 
       if (document === window.document) {
         defineVideoController();
@@ -320,17 +204,15 @@
             return false;
           }
 
-          if (keyCode == tc.settings.displayKeyCode) {
-            runAction('display', document, true)
+          var action;
+          for (var item in tc.settings.keyBindings) {
+            if (tc.settings.keyBindings[item].key === keyCode) {
+              action = item;
+            }
           }
-        var item = tc.settings.keyBindings.find(item => item.key === keyCode);
-        if (item) {
-          runAction(item.action, document, item.value);
-          if (item.force === "true") {// disable websites key bindings
-            event.preventDefault();
-            event.stopPropagation();
+          if (action) {
+            runAction(action, document, tc.settings.keyBindings[action].value);
           }
-        }
 
           return false;
         }, true);
@@ -384,6 +266,13 @@
 
       var frameTags = document.getElementsByTagName('iframe');
       forEach.call(frameTags, function(frame) {
+        if (tc.settings.goYoutube) {
+          var match = /youtube\.com\/(?:v|embed)\/([a-zA-Z0-9_-]+)/.exec(frame.src);
+          if (match != null) {
+              location.href = 'https://youtube.com/watch?v=' + match[1];
+          }
+        }
+
         // Ignore frames we don't have permission to access (different origin).
         try { var childDocument = frame.contentDocument } catch (e) { return }
         initializeWhenReady(childDocument);
@@ -416,66 +305,23 @@
           var s = Math.max(v.playbackRate - value, 0.07);
           v.playbackRate = Number(s.toFixed(2));
         } else if (action === 'reset') {
-          resetSpeed(v, 1.0);
+          v.playbackRate = 1.0;
         } else if (action === 'display') {
           controller.classList.add('vsc-manual');
           controller.classList.toggle('vsc-hidden');
         } else if (action === 'drag') {
           handleDrag(v, controller, e);
         } else if (action === 'fast') {
-          resetSpeed(v, value);
+          v.playbackRate = Number(s.toFixed(2));
         } else if (action === 'pause') {
-          pauseSpeed(v, value);
-        } else if (action === 'muted') {
-          muted(v, value);
+          if (v.paused) {
+            v.play()
+          } else {
+            v.pause();
+          }
         }
       }
     });
-  }
-
-  function pauseSpeed(v, target) {
-    // not working as expected in youtube for now
-    if (v.playbackRate === target) {
-      v.play()
-    }
-    resetSpeed(v, target)
-  }
-
-  function resetSpeed(v, target) {
-    if (v.playbackRate === target) {
-      if (v.playbackRate === getKeyBindings("reset")) { // resetSpeed
-        if (target !== 1.0) {
-          v.playbackRate = 1.0;
-        } else {
-          v.playbackRate = getKeyBindings("fast"); // fastSpeed
-        }
-      }
-      else
-      {
-        v.playbackRate = getKeyBindings("reset"); // resetSpeed
-      }
-    } else {
-      setKeyBindings("reset", v.playbackRate);// resetSpeed
-      // chrome.storage.sync.set({'resetSpeed': v.playbackRate});
-      v.playbackRate = target;
-    }
-  }
-
-  function muted(v, value) {
-    v.muted = v.muted !== true; //reverse muted status
-    /* this can be used if someone wants just mute button
-      switch (value) {
-          case 2:
-              v.muted = false;
-              break;
-          case 1:
-              v.muted = true;
-              break;
-          default:
-              v.muted = v.muted !== true;
-              break;
-      }
-      */
   }
 
   function handleDrag(video, controller, e) {
