@@ -1,27 +1,27 @@
-var tcDefaults = {
+const tcDefaults = {
   speed: 1.0,
   rememberSpeed: false,
   startHidden: false,
   enableSeek: false,
   goYoutube: false,
   keyBindings: {
-    display: {key: 86},            // V
-    slower: {key: 88, value: 0.1}, // X
-    faster: {key: 66, value: 0.1}, // B
-    rewind: {key: 37, value: 10},  // ←
-    advance: {key: 39, value: 10}, // →
-    reset: {key: 90},              // Z
-    fast: {key: 71, value: 1.8},   // G
-    pause: {key: 32}               // Space
-  }
+    display: { key: 86 }, // V
+    slower: { key: 88, value: 0.1 }, // X
+    faster: { key: 66, value: 0.1 }, // B
+    rewind: { key: 37, value: 10 }, // ←
+    advance: { key: 39, value: 10 }, // →
+    reset: { key: 90 }, // Z
+    fast: { key: 71, value: 1.8 }, // G
+    pause: { key: 32 }, // Space
+  },
 };
 
-var keyBindings = {};
+let keyBindings = {};
 
-var keyCodeAliases = {
-  0: 'null',
-  null: 'null',
-  undefined: 'null',
+const keyCodeAliases = {
+  0: '지정 안 됨',
+  null: '지정 안 됨',
+  undefined: '지정 안 됨',
   32: 'Space',
   37: '←',
   38: '↑',
@@ -53,13 +53,13 @@ var keyCodeAliases = {
   220: '\\',
   221: ']',
   222: '\'',
-}
+};
 
 function recordKeyPress(e) {
   if (
-    (e.keyCode >= 48 && e.keyCode <= 57)    // Numbers 0-9
+    (e.keyCode >= 48 && e.keyCode <= 57) // Numbers 0-9
     || (e.keyCode >= 65 && e.keyCode <= 90) // Letters A-Z
-    || keyCodeAliases[e.keyCode]            // Other character keys
+    || keyCodeAliases[e.keyCode] // Other character keys
   ) {
     e.target.value = keyCodeAliases[e.keyCode] || String.fromCharCode(e.keyCode);
     e.target.keyCode = e.keyCode;
@@ -73,34 +73,26 @@ function recordKeyPress(e) {
     e.preventDefault();
     e.stopPropagation();
   } else if (e.keyCode === 8 || e.keyCode === 27) { // Clear input
-    e.target.value = 'null';
+    e.target.value = '지정 안 됨';
     e.target.keyCode = null;
   }
-};
-
-function inputFilterNumbersOnly(e) {
-  var char = String.fromCharCode(e.keyCode);
-  if (!/[\d\.]$/.test(char) || !/^\d+(\.\d*)?$/.test(e.target.value + char)) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-};
+}
 
 function setStatus(text) {
-  var status = document.getElementById('status');
+  const status = document.getElementById('status');
   status.textContent = text;
-  setTimeout(function() {
+  setTimeout(() => {
     status.textContent = '';
   }, 1000);
 }
 
 function inputFocus(e) {
-   e.target.value = "";
-};
+  e.target.value = '';
+}
 
 function inputBlur(e) {
   e.target.value = keyCodeAliases[e.target.keyCode] || String.fromCharCode(e.target.keyCode);
-};
+}
 
 function updateShortcutInputText(inputId, keyCode) {
   document.getElementById(inputId).value = keyCodeAliases[keyCode] || String.fromCharCode(keyCode);
@@ -108,92 +100,83 @@ function updateShortcutInputText(inputId, keyCode) {
 }
 
 function createKeyBindings(item) {
-  var action = item.id;
-  var key = item.keyCode;
-  var valueInput = document.getElementById(action + "Value");
-  var value;
+  const action = item.id;
+  const key = item.keyCode;
+  const valueInput = document.getElementById(`${action}Value`);
+  let value;
   if (valueInput) {
     value = Number(valueInput.value);
   }
-  keyBindings[action] = {key: key, value: value};
+  keyBindings[action] = { key, value };
 }
 
 // Saves options to chrome.storage
-function save_options() {
+function saveOptions() {
   keyBindings = {};
-  Array.from(document.querySelectorAll(".key")).forEach(createKeyBindings); // Remove added shortcuts
+  Array.from(document.querySelectorAll('.key')).forEach(createKeyBindings);
 
-  var rememberSpeed = document.getElementById('rememberSpeed').checked;
-  var startHidden = document.getElementById('startHidden').checked;
-  var enableSeek = document.getElementById('enableSeek').checked;
-  var goYoutube = document.getElementById('goYoutube').checked;
+  const rememberSpeed = document.getElementById('rememberSpeed').checked;
+  const startHidden = document.getElementById('startHidden').checked;
+  const enableSeek = document.getElementById('enableSeek').checked;
+  const goYoutube = document.getElementById('goYoutube').checked;
 
   chrome.storage.sync.set({
-    rememberSpeed: rememberSpeed,
-    startHidden: startHidden,
-    keyBindings: keyBindings,
-    enableSeek: enableSeek,
-    goYoutube: goYoutube
-  }, function() {
+    rememberSpeed,
+    startHidden,
+    keyBindings,
+    enableSeek,
+    goYoutube,
+  }, () => {
     setStatus('설정이 저장되었습니다.');
   });
 }
 
 // Restores options from chrome.storage
-function restore_options() {
-  chrome.storage.sync.get(tcDefaults, function(storage) {
+function restoreOptions() {
+  chrome.storage.sync.get(tcDefaults, (storage) => {
     document.getElementById('rememberSpeed').checked = storage.rememberSpeed;
     document.getElementById('startHidden').checked = storage.startHidden;
     document.getElementById('enableSeek').checked = storage.enableSeek;
     document.getElementById('goYoutube').checked = storage.goYoutube;
 
-    for (var action in storage.keyBindings) {
-      var item = storage.keyBindings[action];
-      updateShortcutInputText(action, item["key"]);
-      var valueInput = document.getElementById(action + "Value");
+    for (const action in storage.keyBindings) {
+      const item = storage.keyBindings[action];
+      updateShortcutInputText(action, item.key);
+      const valueInput = document.getElementById(`${action}Value`);
       if (valueInput) {
-        valueInput.value = item["value"];
+        valueInput.value = item.value;
       }
     }
   });
 }
 
-function restore_defaults() {
-  chrome.storage.sync.set(tcDefaults, function() {
-    restore_options();
+function restoreDefaults() {
+  chrome.storage.sync.set(tcDefaults, () => {
+    restoreOptions();
     setStatus('설정이 초기화되었습니다.');
   });
 }
 
-function initShortcutInput(inputId) {
-  document.getElementById(inputId).addEventListener('focus', inputFocus);
-  document.getElementById(inputId).addEventListener('blur', inputBlur);
-  document.getElementById(inputId).addEventListener('keydown', recordKeyPress);
-}
+document.addEventListener('DOMContentLoaded', () => {
+  restoreOptions();
 
-document.addEventListener('DOMContentLoaded', function () {
-  restore_options();
-
-  document.getElementById('save').addEventListener('click', save_options);
-  document.getElementById('restore').addEventListener('click', restore_defaults);
+  document.getElementById('save').addEventListener('click', saveOptions);
+  document.getElementById('restore').addEventListener('click', restoreDefaults);
 
   function eventCaller(event, className, funcName) {
     if (!event.target.classList.contains(className)) {
-      return
+      return;
     }
     funcName(event);
   }
 
-  document.addEventListener('keypress', (event) => {
-    eventCaller(event, "customValue", inputFilterNumbersOnly)
-  });
   document.addEventListener('focus', (event) => {
-    eventCaller(event, "key", inputFocus)
+    eventCaller(event, 'key', inputFocus);
   }, true);
   document.addEventListener('blur', (event) => {
-    eventCaller(event, "key", inputBlur)
+    eventCaller(event, 'key', inputBlur);
   }, true);
   document.addEventListener('keydown', (event) => {
-    eventCaller(event, "key", recordKeyPress)
+    eventCaller(event, 'key', recordKeyPress);
   });
-})
+});

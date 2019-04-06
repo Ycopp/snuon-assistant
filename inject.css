@@ -1,5 +1,6 @@
 .vsc-hidden { display: none !important; }
+
 .vsc-manual {
-  visibility: visible !important;
-  opacity: 1.0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
