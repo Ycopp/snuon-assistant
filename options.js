@@ -5,13 +5,13 @@ const tcDefaults = {
   enableSeek: false,
   goYoutube: false,
   keyBindings: {
-    display: { key: 86 }, // V
+    display: { key: 65 }, // A
     slower: { key: 88, value: 0.1 }, // X
-    faster: { key: 66, value: 0.1 }, // B
+    faster: { key: 67, value: 0.1 }, // C
     rewind: { key: 37, value: 10 }, // ←
     advance: { key: 39, value: 10 }, // →
     reset: { key: 90 }, // Z
-    fast: { key: 71, value: 1.8 }, // G
+    fast: { key: 86, value: 1.8 }, // V
     pause: { key: 32 }, // Space
   },
 };
