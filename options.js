@@ -164,10 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('restore').addEventListener('click', restoreDefaults);
 
   function eventCaller(event, className, funcName) {
-    if (!event.target.classList.contains(className)) {
-      return;
+    if (event.target.classList.contains(className)) {
+      funcName(event);
     }
-    funcName(event);
   }
 
   document.addEventListener('focus', (event) => {

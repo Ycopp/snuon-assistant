@@ -45,7 +45,7 @@ function defineVideoController() {
     });
 
     target.addEventListener('ratechange', (event) => {
-      // Ignore ratechange events on unitialized videos.
+      // Ignore ratechange events on uninitialized videos.
       // 0 == No information is available about the media resource.
       if (event.target.readyState > 0) {
         const speed = this.getSpeed();
@@ -82,12 +82,12 @@ function defineVideoController() {
     }
 
     const shadow = wrapper.attachShadow({ mode: 'open' });
-    const shadowTemplate = `
+    shadow.innerHTML = `
         <style>
           @import "${chrome.runtime.getURL('shadow.css')}";
         </style>
 
-        <div id="controller" style="top:${top}; left:${left}">
+        <div id="controller" style="top:${top}; left:${left};">
           <span data-action="drag" class="draggable">${speed}</span>
           <span id="controls">
             <button data-action="rewind" class="rw">«</button>
@@ -97,8 +97,7 @@ function defineVideoController() {
             <button data-action="display" class="hideButton">x</button>
           </span>
         </div>
-      `;
-    shadow.innerHTML = shadowTemplate;
+`;
     shadow.querySelector('.draggable').addEventListener('mousedown', (e) => {
       runAction(e.target.dataset.action, document, false, e);
     });
@@ -121,11 +120,6 @@ function defineVideoController() {
 }
 
 function initializeWhenReady(document) {
-  escapeStringRegExp.matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
-  function escapeStringRegExp(str) {
-    return str.replace(escapeStringRegExp.matchOperatorsRe, '\\$&');
-  }
-
   window.onload = () => {
     initializeNow(window.document);
   };
@@ -229,16 +223,14 @@ function initializeNow(document) {
     requestIdleCallback(() => {
       mutations.forEach((mutation) => {
         forEach.call(mutation.addedNodes, (node) => {
-          if (typeof node === 'function') {
-            return;
+          if (typeof node !== 'function') {
+            checkForVideo(node, node.parentNode || mutation.target, true);
           }
-          checkForVideo(node, node.parentNode || mutation.target, true);
         });
         forEach.call(mutation.removedNodes, (node) => {
-          if (typeof node === 'function') {
-            return;
+          if (typeof node !== 'function') {
+            checkForVideo(node, node.parentNode || mutation.target, false);
           }
-          checkForVideo(node, node.parentNode || mutation.target, false);
         });
       });
     }, { timeout: 1000 });
