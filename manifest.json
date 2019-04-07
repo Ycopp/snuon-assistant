@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "manifest_version": 2,
   "description": "SNUON 단축키, 배속 재생 등",
-  "homepage_url": "https://github.com/ylemkimon/snuon-assistant",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
