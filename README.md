@@ -1,7 +1,4 @@
 # SNUON Assistant
-
-## License
-
-MIT License
-Copyright (c) 2014 Ilya Grigorik
-Copyright (c) 2019 ylemkimon
+![Screenshot 1](screenshots/1.png)
+![Screenshot 2](screenshots/2.png)
+![Screenshot 3](screenshots/3.png)
