@@ -10,16 +10,8 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": [ "activeTab", "storage" ],
+  "permissions": [ "storage" ],
   "options_page": "options.html",
-  "browser_action": {
-    "default_icon": {
-      "19": "icons/icon19.png",
-      "38": "icons/icon38.png",
-      "48": "icons/icon48.png"
-    },
-    "default_popup": "popup.html"
-  },
   "content_scripts": [{
       "matches": [
         "http://etl.snu.ac.kr/mod/vod/viewer.php*",
