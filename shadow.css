@@ -4,6 +4,10 @@
     font-size: 13px;
 }
 
+#controls {
+    display: none;
+}
+
 :host(:hover) #controls {
     display: inline;
 }
@@ -22,16 +26,20 @@
     opacity: 0.3;
 }
 
+.draggable {
+    cursor: -webkit-grab;
+}
+
+.draggable:active {
+    cursor: -webkit-grabbing;
+}
+
 #controller:hover {
     opacity: 0.7;
 }
 
 #controller:hover > .draggable {
     margin-right: 0.8em;
-}
-
-#controls {
-    display: none;
 }
 
 #controller.dragging {
@@ -41,14 +49,6 @@
 
 #controller.dragging #controls {
     display: inline;
-}
-
-.draggable {
-    cursor: -webkit-grab;
-}
-
-.draggable:active {
-    cursor: -webkit-grabbing;
 }
 
 button {

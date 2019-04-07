@@ -8,8 +8,8 @@ body {
 }
 
 h1,
- h2,
- h3 {
+h2,
+h3 {
     font-weight: normal;
     line-height: 1;
     user-select: none;
@@ -41,7 +41,7 @@ header {
 }
 
 header,
- section {
+section {
     min-width: 600px;
     max-width: 738px;
 }
