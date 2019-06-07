@@ -10,7 +10,10 @@
     "128": "icons/icon128.png"
   },
   "permissions": [ "storage" ],
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "content_scripts": [{
       "matches": [
         "http://etl.snu.ac.kr/mod/vod/viewer.php*",
