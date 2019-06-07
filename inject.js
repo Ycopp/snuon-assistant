@@ -76,6 +76,7 @@ function defineVideoController() {
     wrapper.classList.add('vsc-controller');
     wrapper.dataset.vscid = this.id;
     wrapper.addEventListener('pointerdown', e => e.stopPropagation());
+    wrapper.addEventListener('touchstart', e => e.stopPropagation());
 
     if (tc.settings.startHidden) {
       wrapper.classList.add('vsc-hidden');
