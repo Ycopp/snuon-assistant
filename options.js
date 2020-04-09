@@ -3,6 +3,7 @@ const tcDefaults = {
   rememberSpeed: false,
   startHidden: false,
   enableSeek: false,
+  enableMulti: false,
   goYoutube: false,
   keyBindings: {
     display: { key: 65 }, // A
@@ -118,6 +119,7 @@ function saveOptions() {
   const rememberSpeed = document.getElementById('rememberSpeed').checked;
   const startHidden = document.getElementById('startHidden').checked;
   const enableSeek = document.getElementById('enableSeek').checked;
+  const enableMulti = document.getElementById('enableMulti').checked;
   const goYoutube = document.getElementById('goYoutube').checked;
 
   chrome.storage.sync.set({
@@ -125,6 +127,7 @@ function saveOptions() {
     startHidden,
     keyBindings,
     enableSeek,
+    enableMulti,
     goYoutube,
   }, () => {
     setStatus('설정이 저장되었습니다.');
@@ -137,6 +140,7 @@ function restoreOptions() {
     document.getElementById('rememberSpeed').checked = storage.rememberSpeed;
     document.getElementById('startHidden').checked = storage.startHidden;
     document.getElementById('enableSeek').checked = storage.enableSeek;
+    document.getElementById('enableMulti').checked = storage.enableMulti;
     document.getElementById('goYoutube').checked = storage.goYoutube;
 
     for (const action in storage.keyBindings) {

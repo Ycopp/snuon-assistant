@@ -4,6 +4,7 @@ const tc = {
     rememberSpeed: false,
     startHidden: false,
     enableSeek: false,
+    enableMulti: false,
     goYoutube: false,
     keyBindings: {
       display: { key: 65 }, // A
@@ -147,6 +148,12 @@ function initializeNow(document) {
   if (tc.settings.enableSeek) {
     const s = document.createElement('script');
     s.textContent = "$(function(){jwplayer().off('seek')})";
+    (document.head || document.documentElement).appendChild(s);
+  }
+
+  if (tc.settings.enableMulti) {
+    const s = document.createElement('script');
+    s.textContent = "$(function(){socket.off('msg')})";
     (document.head || document.documentElement).appendChild(s);
   }
 
