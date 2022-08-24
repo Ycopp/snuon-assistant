@@ -17,7 +17,9 @@
   "content_scripts": [{
       "matches": [
         "http://etl.snu.ac.kr/mod/vod/viewer.php*",
-        "https://etl.snu.ac.kr/mod/vod/viewer.php*"
+        "https://etl.snu.ac.kr/mod/vod/viewer.php*",
+        "http://oldetl.snu.ac.kr/mod/vod/viewer.php*",
+        "https://oldetl.snu.ac.kr/mod/vod/viewer.php*"
       ],
       "css": [ "inject.css" ],
       "js":  [ "inject.js" ]
